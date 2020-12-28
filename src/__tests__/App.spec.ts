@@ -56,6 +56,28 @@ describe('App', () => {
     );
   });
 
+  it('should not expose the password_hash while creating a new user', async () => {
+    const name = 'User';
+    const surname = 'One';
+    const email = 'user1@email.com';
+    const password = '123456';
+
+    const response = await request(app).post('/users').send({
+      name,
+      surname,
+      email,
+      password,
+    });
+
+    const { user } = response.body;
+
+    /**
+     * Partial matching test
+     * Ref: https://codewithhugo.com/jest-array-object-match-contain/
+     */
+    expect(user.password_hash).toEqual(undefined);
+  });
+
   // it('should not be able to create a user with one e-mail thats already registered', async () => {
   //   const user = await request(app).post('/users').send({
   //     name: 'User',
