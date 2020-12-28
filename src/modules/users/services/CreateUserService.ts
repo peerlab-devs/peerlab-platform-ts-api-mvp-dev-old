@@ -7,6 +7,8 @@ import IUsersRepository from '@modules/users/repositories/IUsersRepository';
 import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
 import ISchema from '@modules/users/providers/SchemaValidationProvider/shared/models/ISchema';
 
+import { classToClass } from 'class-transformer';
+
 @injectable()
 class CreateUserService {
   constructor(
@@ -36,7 +38,7 @@ class CreateUserService {
     const user = await this.usersRepository.create(data);
 
     /** Retorna resultado */
-    return user;
+    return classToClass(user);
   }
 }
 
