@@ -15,6 +15,7 @@ class UsersRepository implements IUsersRepository {
     const user = this.ormRepository.create({
       name,
       email,
+      password_hash: 'a',
     });
 
     await this.ormRepository.save(user);
