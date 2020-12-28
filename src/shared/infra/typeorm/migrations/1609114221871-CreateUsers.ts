@@ -35,6 +35,13 @@ export default class CreateUsers1609114221871 implements MigrationInterface {
           },
           /** Outra coluna */
           {
+            name: 'surname',
+            type: 'varchar',
+            /** Pode ser nulo? (true | false) (o padrão já é false) */
+            isNullable: false,
+          },
+          /** Outra coluna */
+          {
             name: 'email',
             /** Define tipo timestamp com timezone */
             type: 'varchar',
