@@ -6,6 +6,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+/** Importa opcoes de alteracao de classes antes do envio para frontend */
+import { Exclude } from 'class-transformer';
+
 @Entity('users')
 class User {
   @PrimaryGeneratedColumn('uuid')
@@ -15,9 +18,13 @@ class User {
   name: string;
 
   @Column()
+  surname: string;
+
+  @Column()
   email: string;
 
   @Column()
+  @Exclude() // Exclui quando ClassToClass for aplicado
   password_hash: string;
 
   @CreateDateColumn()

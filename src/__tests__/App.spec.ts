@@ -29,273 +29,314 @@ describe('App', () => {
   });
 
   it('should be able to create a new user', async () => {
-    const response = await request(app).post('/users').send({
-      name: 'Rocketseat',
-      email: 'oi@rocketseat.com.br',
-    });
-
-    expect(response.body).toEqual(
-      expect.objectContaining({
-        name: 'Rocketseat',
-        email: 'oi@rocketseat.com.br',
-      }),
-    );
-  });
-
-  it('should not be able to create a user with one e-mail thats already registered', async () => {
-    const user = await request(app).post('/users').send({
-      name: 'Rocketseat',
-      email: 'oi@rocketseat.com.br',
-    });
-
-    expect(user.body).toEqual(
-      expect.objectContaining({
-        name: 'Rocketseat',
-        email: 'oi@rocketseat.com.br',
-      }),
-    );
+    const name = 'User';
+    const surname = 'One';
+    const email = 'user1@email.com';
+    const password = '123456';
 
     const response = await request(app).post('/users').send({
-      name: 'Rocketseat',
-      email: 'oi@rocketseat.com.br',
+      name,
+      surname,
+      email,
+      password,
     });
 
-    expect(response.status).toBe(400);
-  });
+    const { user } = response.body;
 
-  it('should be able to create a new product', async () => {
-    const response = await request(app).post('/products').send({
-      name: 'Produto 01',
-      price: 500,
-      quantity: 50,
-    });
-
-    expect(response.body).toEqual(
+    /**
+     * Partial matching test
+     * Ref: https://codewithhugo.com/jest-array-object-match-contain/
+     */
+    expect(user).toEqual(
       expect.objectContaining({
-        name: 'Produto 01',
-        price: 500,
-        quantity: 50,
+        name,
+        surname,
+        email,
       }),
     );
   });
 
-  it('should not be able to create a duplicated product', async () => {
-    const product = await request(app).post('/products').send({
-      name: 'Produto 01',
-      price: 500,
-      quantity: 50,
+  it('should not expose the password_hash while creating a new user', async () => {
+    const name = 'User';
+    const surname = 'One';
+    const email = 'user1@email.com';
+    const password = '123456';
+
+    const response = await request(app).post('/users').send({
+      name,
+      surname,
+      email,
+      password,
     });
 
-    expect(product.body).toEqual(
-      expect.objectContaining({
-        name: 'Produto 01',
-        price: 500,
-        quantity: 50,
-      }),
-    );
+    const { user } = response.body;
 
-    const response = await request(app).post('/products').send({
-      name: 'Produto 01',
-      price: 500,
-      quantity: 50,
-    });
-
-    expect(response.status).toBe(400);
+    /**
+     * Partial matching test
+     * Ref: https://codewithhugo.com/jest-array-object-match-contain/
+     */
+    expect(user.password_hash).toEqual(undefined);
   });
 
-  it('should be able to create a new order', async () => {
-    const product = await request(app).post('/products').send({
-      name: 'Produto 01',
-      price: 500,
-      quantity: 50,
-    });
+  // it('should not be able to create a user with one e-mail thats already registered', async () => {
+  //   const user = await request(app).post('/users').send({
+  //     name: 'User',
+  //     surname: 'One',
+  //     email: 'user1@email.com',
+  //     password: '123456',
+  //   });
 
-    const user = await request(app).post('/users').send({
-      name: 'Rocketseat',
-      email: 'oi@rocketseat.com.br',
-    });
+  //   expect(user.body).toEqual(
+  //     expect.objectContaining({
+  //       name: 'User',
+  //       surname: 'One',
+  //       email: 'user1@email.com',
+  //     }),
+  //   );
 
-    const response = await request(app)
-      .post('/orders')
-      .send({
-        user_id: user.body.id,
-        products: [
-          {
-            id: product.body.id,
-            quantity: 5,
-          },
-        ],
-      });
+  //   const response = await request(app).post('/users').send({
+  //     name: 'User',
+  //     surname: 'One',
+  //     email: 'user1@email.com',
+  //     password: '123456',
+  //   });
 
-    expect(response.body).toEqual(
-      expect.objectContaining({
-        user: expect.objectContaining({
-          id: user.body.id,
-          name: 'Rocketseat',
-          email: 'oi@rocketseat.com.br',
-        }),
-        order_products: expect.arrayContaining([
-          expect.objectContaining({
-            product_id: product.body.id,
-            price: '500.00',
-            quantity: 5,
-          }),
-        ]),
-      }),
-    );
-  });
+  //   expect(response.status).toBe(400);
+  // });
 
-  it('should not be able to create an order with a invalid user', async () => {
-    const response = await request(app).post('/orders').send({
-      user_id: '6a1922c8-af6e-470e-9a34-621cb0643911',
-    });
+  // it('should be able to create a new product', async () => {
+  //   const response = await request(app).post('/products').send({
+  //     name: 'Produto 01',
+  //     price: 500,
+  //     quantity: 50,
+  //   });
 
-    expect(response.status).toEqual(400);
-  });
+  //   expect(response.body).toEqual(
+  //     expect.objectContaining({
+  //       name: 'Produto 01',
+  //       price: 500,
+  //       quantity: 50,
+  //     }),
+  //   );
+  // });
 
-  it('should not be able to create an order with invalid products', async () => {
-    const user = await request(app).post('/users').send({
-      name: 'Rocketseat',
-      email: 'oi@rocketseat.com.br',
-    });
+  // it('should not be able to create a duplicated product', async () => {
+  //   const product = await request(app).post('/products').send({
+  //     name: 'Produto 01',
+  //     price: 500,
+  //     quantity: 50,
+  //   });
 
-    const response = await request(app)
-      .post('/orders')
-      .send({
-        user_id: user.body.id,
-        products: [
-          {
-            id: '6a1922c8-af6e-470e-9a34-621cb0643911',
-          },
-        ],
-      });
+  //   expect(product.body).toEqual(
+  //     expect.objectContaining({
+  //       name: 'Produto 01',
+  //       price: 500,
+  //       quantity: 50,
+  //     }),
+  //   );
 
-    expect(response.status).toEqual(400);
-  });
+  //   const response = await request(app).post('/products').send({
+  //     name: 'Produto 01',
+  //     price: 500,
+  //     quantity: 50,
+  //   });
 
-  it('should not be able to create an order with products with insufficient quantities', async () => {
-    const user = await request(app).post('/users').send({
-      name: 'Rocketseat',
-      email: 'oi@rocketseat.com.br',
-    });
+  //   expect(response.status).toBe(400);
+  // });
 
-    const product = await request(app).post('/products').send({
-      name: 'Produto 01',
-      price: 500,
-      quantity: 50,
-    });
+  // it('should be able to create a new order', async () => {
+  //   const product = await request(app).post('/products').send({
+  //     name: 'Produto 01',
+  //     price: 500,
+  //     quantity: 50,
+  //   });
 
-    const response = await request(app)
-      .post('/orders')
-      .send({
-        user_id: user.body.id,
-        products: [
-          {
-            id: product.body.id,
-            quantity: 500,
-          },
-        ],
-      });
+  //   const user = await request(app).post('/users').send({
+  //     name: 'Rocketseat',
+  //     email: 'oi@rocketseat.com.br',
+  //   });
 
-    expect(response.status).toEqual(400);
-  });
+  //   const response = await request(app)
+  //     .post('/orders')
+  //     .send({
+  //       user_id: user.body.id,
+  //       products: [
+  //         {
+  //           id: product.body.id,
+  //           quantity: 5,
+  //         },
+  //       ],
+  //     });
 
-  it('should be able to subtract an product total quantity when it is ordered', async () => {
-    const productsRepository = getRepository(Product);
+  //   expect(response.body).toEqual(
+  //     expect.objectContaining({
+  //       user: expect.objectContaining({
+  //         id: user.body.id,
+  //         name: 'Rocketseat',
+  //         email: 'oi@rocketseat.com.br',
+  //       }),
+  //       order_products: expect.arrayContaining([
+  //         expect.objectContaining({
+  //           product_id: product.body.id,
+  //           price: '500.00',
+  //           quantity: 5,
+  //         }),
+  //       ]),
+  //     }),
+  //   );
+  // });
 
-    const user = await request(app).post('/users').send({
-      name: 'Rocketseat',
-      email: 'oi@rocketseat.com.br',
-    });
+  // it('should not be able to create an order with a invalid user', async () => {
+  //   const response = await request(app).post('/orders').send({
+  //     user_id: '6a1922c8-af6e-470e-9a34-621cb0643911',
+  //   });
 
-    const product = await request(app).post('/products').send({
-      name: 'Produto 01',
-      price: 500,
-      quantity: 50,
-    });
+  //   expect(response.status).toEqual(400);
+  // });
 
-    await request(app)
-      .post('/orders')
-      .send({
-        user_id: user.body.id,
-        products: [
-          {
-            id: product.body.id,
-            quantity: 5,
-          },
-        ],
-      });
+  // it('should not be able to create an order with invalid products', async () => {
+  //   const user = await request(app).post('/users').send({
+  //     name: 'Rocketseat',
+  //     email: 'oi@rocketseat.com.br',
+  //   });
 
-    let foundProduct = await productsRepository.findOne(product.body.id);
+  //   const response = await request(app)
+  //     .post('/orders')
+  //     .send({
+  //       user_id: user.body.id,
+  //       products: [
+  //         {
+  //           id: '6a1922c8-af6e-470e-9a34-621cb0643911',
+  //         },
+  //       ],
+  //     });
 
-    expect(foundProduct).toEqual(
-      expect.objectContaining({
-        quantity: 45,
-      }),
-    );
+  //   expect(response.status).toEqual(400);
+  // });
 
-    await request(app)
-      .post('/orders')
-      .send({
-        user_id: user.body.id,
-        products: [
-          {
-            id: product.body.id,
-            quantity: 5,
-          },
-        ],
-      });
+  // it('should not be able to create an order with products with insufficient quantities', async () => {
+  //   const user = await request(app).post('/users').send({
+  //     name: 'Rocketseat',
+  //     email: 'oi@rocketseat.com.br',
+  //   });
 
-    foundProduct = await productsRepository.findOne(product.body.id);
+  //   const product = await request(app).post('/products').send({
+  //     name: 'Produto 01',
+  //     price: 500,
+  //     quantity: 50,
+  //   });
 
-    expect(foundProduct).toEqual(
-      expect.objectContaining({
-        quantity: 40,
-      }),
-    );
-  });
+  //   const response = await request(app)
+  //     .post('/orders')
+  //     .send({
+  //       user_id: user.body.id,
+  //       products: [
+  //         {
+  //           id: product.body.id,
+  //           quantity: 500,
+  //         },
+  //       ],
+  //     });
 
-  it('should be able to list one specific order', async () => {
-    const user = await request(app).post('/users').send({
-      name: 'Rocketseat',
-      email: 'oi@rocketseat.com.br',
-    });
+  //   expect(response.status).toEqual(400);
+  // });
 
-    const product = await request(app).post('/products').send({
-      name: 'Produto 01',
-      price: 500,
-      quantity: 50,
-    });
+  // it('should be able to subtract an product total quantity when it is ordered', async () => {
+  //   const productsRepository = getRepository(Product);
 
-    const order = await request(app)
-      .post('/orders')
-      .send({
-        user_id: user.body.id,
-        products: [
-          {
-            id: product.body.id,
-            quantity: 5,
-          },
-        ],
-      });
+  //   const user = await request(app).post('/users').send({
+  //     name: 'Rocketseat',
+  //     email: 'oi@rocketseat.com.br',
+  //   });
 
-    const response = await request(app).get(`/orders/${order.body.id}`);
+  //   const product = await request(app).post('/products').send({
+  //     name: 'Produto 01',
+  //     price: 500,
+  //     quantity: 50,
+  //   });
 
-    expect(response.body).toEqual(
-      expect.objectContaining({
-        user: expect.objectContaining({
-          id: user.body.id,
-          name: 'Rocketseat',
-          email: 'oi@rocketseat.com.br',
-        }),
-        order_products: expect.arrayContaining([
-          expect.objectContaining({
-            product_id: product.body.id,
-            price: '500.00',
-            quantity: 5,
-          }),
-        ]),
-      }),
-    );
-  });
+  //   await request(app)
+  //     .post('/orders')
+  //     .send({
+  //       user_id: user.body.id,
+  //       products: [
+  //         {
+  //           id: product.body.id,
+  //           quantity: 5,
+  //         },
+  //       ],
+  //     });
+
+  //   let foundProduct = await productsRepository.findOne(product.body.id);
+
+  //   expect(foundProduct).toEqual(
+  //     expect.objectContaining({
+  //       quantity: 45,
+  //     }),
+  //   );
+
+  //   await request(app)
+  //     .post('/orders')
+  //     .send({
+  //       user_id: user.body.id,
+  //       products: [
+  //         {
+  //           id: product.body.id,
+  //           quantity: 5,
+  //         },
+  //       ],
+  //     });
+
+  //   foundProduct = await productsRepository.findOne(product.body.id);
+
+  //   expect(foundProduct).toEqual(
+  //     expect.objectContaining({
+  //       quantity: 40,
+  //     }),
+  //   );
+  // });
+
+  // it('should be able to list one specific order', async () => {
+  //   const user = await request(app).post('/users').send({
+  //     name: 'Rocketseat',
+  //     email: 'oi@rocketseat.com.br',
+  //   });
+
+  //   const product = await request(app).post('/products').send({
+  //     name: 'Produto 01',
+  //     price: 500,
+  //     quantity: 50,
+  //   });
+
+  //   const order = await request(app)
+  //     .post('/orders')
+  //     .send({
+  //       user_id: user.body.id,
+  //       products: [
+  //         {
+  //           id: product.body.id,
+  //           quantity: 5,
+  //         },
+  //       ],
+  //     });
+
+  //   const response = await request(app).get(`/orders/${order.body.id}`);
+
+  //   expect(response.body).toEqual(
+  //     expect.objectContaining({
+  //       user: expect.objectContaining({
+  //         id: user.body.id,
+  //         name: 'Rocketseat',
+  //         email: 'oi@rocketseat.com.br',
+  //       }),
+  //       order_products: expect.arrayContaining([
+  //         expect.objectContaining({
+  //           product_id: product.body.id,
+  //           price: '500.00',
+  //           quantity: 5,
+  //         }),
+  //       ]),
+  //     }),
+  //   );
+  // });
 });

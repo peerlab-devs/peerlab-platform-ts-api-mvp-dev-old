@@ -5,7 +5,9 @@ import AppError from '@shared/errors/AppError';
 import User from '@modules/users/infra/typeorm/entities/User';
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
 import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
-import ICreateUserSchema from '@modules/users/providers/ValidationProvider/models/ICreateUserSchema';
+import ISchema from '@modules/users/providers/SchemaValidationProvider/shared/models/ISchema';
+
+import { classToClass } from 'class-transformer';
 
 @injectable()
 class CreateUserService {
@@ -14,7 +16,7 @@ class CreateUserService {
     private usersRepository: IUsersRepository,
 
     @inject('CreateUserSchema')
-    private createUserSchema: ICreateUserSchema,
+    private createUserSchema: ISchema,
   ) {}
 
   public async execute(data: ICreateUserDTO): Promise<User> {
@@ -36,7 +38,7 @@ class CreateUserService {
     const user = await this.usersRepository.create(data);
 
     /** Retorna resultado */
-    return user;
+    return classToClass(user);
   }
 }
 
