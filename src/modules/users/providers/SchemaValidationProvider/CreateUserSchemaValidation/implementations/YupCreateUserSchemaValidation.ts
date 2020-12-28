@@ -1,10 +1,10 @@
 import * as Yup from 'yup';
 
-import ICreateUserSchema from '../models/ICreateUserSchema';
+import ISchema from '@modules/users/providers/SchemaValidationProvider/shared/models/ISchema';
 
 const YupObjectSchema = Yup.object();
 
-class YupCreateUserSchema implements ICreateUserSchema {
+class YupCreateUserSchemaValidation implements ISchema {
   private schema: typeof YupObjectSchema;
 
   constructor() {
@@ -25,4 +25,4 @@ class YupCreateUserSchema implements ICreateUserSchema {
   }
 }
 
-export default YupCreateUserSchema;
+export default YupCreateUserSchemaValidation;
